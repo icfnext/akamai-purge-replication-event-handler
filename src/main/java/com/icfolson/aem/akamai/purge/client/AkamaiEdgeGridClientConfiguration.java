@@ -6,14 +6,11 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 @ObjectClassDefinition(name = "Akamai Edge Grid Client Configuration")
 public @interface AkamaiEdgeGridClientConfiguration {
 
-    @AttributeDefinition(name = "Enable Akamai Edge Grid Client")
-    boolean enabled() default false;
-
-    @AttributeDefinition(name = "Akamai Network", description = "staging or production")
+    @AttributeDefinition(name = "Akamai Network")
     String network() default "production";
 
     @AttributeDefinition(name = "Akamai Hostname")
-    String hostname() default "akab-zai4si42encz4itc-umutbp23o4zar5su.purge.akamaiapis.net";
+    String hostname() default "";
 
     @AttributeDefinition(name = "Akamai Access Token")
     String accessToken() default "";

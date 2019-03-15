@@ -1,16 +1,24 @@
 package com.icfolson.aem.akamai.purge.job;
 
+import com.icfolson.aem.akamai.purge.enums.PurgeAction;
+import com.icfolson.aem.akamai.purge.job.delegate.AkamaiPurgeJobCancelledEventHandlerDelegate;
 import org.apache.sling.api.SlingConstants;
 import org.apache.sling.event.jobs.NotificationConstants;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
- * Example event handler for Akamai purge job cancellations.
+ * Event handler for Akamai purge job cancellations.
  */
 @Component(immediate = true,
     service = EventHandler.class,
@@ -24,13 +32,19 @@ public final class AkamaiPurgeJobCancelledEventHandler implements EventHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(AkamaiPurgeJobCancelledEventHandler.class);
 
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+    private volatile List<AkamaiPurgeJobCancelledEventHandlerDelegate> eventHandlerDelegates = new CopyOnWriteArrayList<>();
+
     @Override
     public void handleEvent(final Event event) {
         final String path = (String) event.getProperty(SlingConstants.PROPERTY_PATH);
-        final String topic = (String) event.getProperty(NotificationConstants.NOTIFICATION_PROPERTY_JOB_TOPIC);
+        final PurgeAction purgeAction = PurgeAction.fromEvent(event);
 
-        LOG.info("job cancelled for page path : {} and topic : {}, sending notification email", path, topic);
+        LOG.info("job cancelled for page path : {} and purge action : {}, delegating to {} event handler services",
+            path, purgeAction, eventHandlerDelegates.size());
 
-        // TODO
+        eventHandlerDelegates.forEach(eventHandlerDelegate -> {
+            eventHandlerDelegate.handleEvent(path, purgeAction);
+        });
     }
 }

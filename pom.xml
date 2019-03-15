@@ -3,11 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    <parent>
+        <groupId>com.icfolson.aem</groupId>
+        <artifactId>aem-parent-uber-jar</artifactId>
+        <version>7.0.1</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.icfolson.aem.akamai</groupId>
-    <artifactId>aem-akamai-purge</artifactId>
+    <artifactId>akamai-purge-replication-event-handler</artifactId>
     <packaging>bundle</packaging>
-    <name>AEM Akamai Purge</name>
+    <name>AEM Akamai Purge Replication Event Handler</name>
+    <description>
+        OSGi bundle providing a replication event handler and Akamai Fast Purge API client to purge content from Akamai
+        when content is replicated.
+    </description>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
@@ -49,7 +59,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Export-Package>!*.impl,com.icfolson.aem.akamai.purge.*</Export-Package>
-                        <Embed-Dependency>groupId=com.akamai.edgegrid;scope=compile</Embed-Dependency>
+                        <Embed-Dependency>groupId=com.akamai.edgegrid;scope=provided</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
@@ -69,79 +79,41 @@
     <dependencies>
         <!-- provided -->
         <dependency>
-            <groupId>com.adobe.aem</groupId>
-            <artifactId>uber-jar</artifactId>
-            <version>6.3.2.2</version>
-            <classifier>apis</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.servlets.annotations</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <!-- OSGi -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.core</artifactId>
-            <version>6.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.cmpn</artifactId>
-            <version>6.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
-            <version>6.0.1</version>
-        </dependency>
-
-        <!-- Jackson -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.8.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.8.4</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.8.4</version>
         </dependency>
 
-        <!-- Akamai -->
+        <!-- akamai -->
         <dependency>
             <groupId>com.akamai.edgegrid</groupId>
             <artifactId>edgegrid-signer-core</artifactId>
             <version>3.0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.akamai.edgegrid</groupId>
             <artifactId>edgegrid-signer-apache-http-client</artifactId>
             <version>3.0.1</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!--
-         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.4</version>
-        </dependency>
+        <!-- AEM uber jar -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.6</version>
+            <groupId>com.adobe.aem</groupId>
+            <artifactId>uber-jar</artifactId>
+            <classifier>apis</classifier>
         </dependency>
-        -->
     </dependencies>
 </project>

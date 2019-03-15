@@ -7,6 +7,7 @@ import com.day.cq.commons.Externalizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icfolson.aem.akamai.purge.client.AkamaiEdgeGridClient;
 import com.icfolson.aem.akamai.purge.client.AkamaiEdgeGridClientConfiguration;
+import com.icfolson.aem.akamai.purge.enums.PurgeAction;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -47,8 +48,6 @@ public final class DefaultAkamaiEdgeGridClient implements AkamaiEdgeGridClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAkamaiEdgeGridClient.class);
 
-    private static final ContentType JSON = ContentType.APPLICATION_JSON;
-
     @Reference
     private ResourceResolverFactory resourceResolverFactory;
 
@@ -57,20 +56,18 @@ public final class DefaultAkamaiEdgeGridClient implements AkamaiEdgeGridClient {
 
     private volatile CloseableHttpClient httpClient;
 
-    private volatile boolean enabled;
-
     private volatile String network;
 
     private volatile String hostname;
 
     @Override
     public void invalidate(final String path) throws IOException, URISyntaxException {
-        purge(path, "invalidate");
+        purge(path, PurgeAction.INVALIDATE);
     }
 
     @Override
     public void delete(final String path) throws IOException, URISyntaxException {
-        purge(path, "delete");
+        purge(path, PurgeAction.DELETE);
     }
 
     @Activate
@@ -89,7 +86,6 @@ public final class DefaultAkamaiEdgeGridClient implements AkamaiEdgeGridClient {
             .setRoutePlanner(new ApacheHttpClientEdgeGridRoutePlanner(credential))
             .build();
 
-        enabled = configuration.enabled();
         network = configuration.network();
         hostname = configuration.hostname();
     }
@@ -99,42 +95,40 @@ public final class DefaultAkamaiEdgeGridClient implements AkamaiEdgeGridClient {
         httpClient.close();
     }
 
-    private void purge(final String path, final String operation) throws IOException, URISyntaxException {
-        if (enabled) {
-            final String json = getJson(path);
-            final HttpEntity entity = new StringEntity(json, JSON);
+    private void purge(final String path, final PurgeAction purgeAction) throws IOException, URISyntaxException {
+        final String json = getJson(path);
+        final HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 
-            final URI uri = new URIBuilder()
-                .setScheme("https")
-                .setHost(hostname)
-                .setPath(new StringBuilder()
-                    .append("/ccu/v3/")
-                    .append(operation)
-                    .append("/url/")
-                    .append(network)
-                    .toString())
-                .build();
+        final URI uri = new URIBuilder()
+            .setScheme("https")
+            .setHost(hostname)
+            .setPath(new StringBuilder()
+                .append("/ccu/v3/")
+                .append(purgeAction.getOperation())
+                .append("/url/")
+                .append(network)
+                .toString())
+            .build();
 
-            LOG.info("sending {} request to URI : {} with JSON entity : {}", operation, uri, json);
+        LOG.info("sending {} request to URI : {} with JSON entity : {}", purgeAction, uri, json);
 
-            final HttpUriRequest request = RequestBuilder.post(uri)
-                .setEntity(entity)
-                .addHeader("Accept", JSON.getMimeType())
-                .addHeader("Content-Type", JSON.getMimeType())
-                .build();
+        final String mimeType = ContentType.APPLICATION_JSON.getMimeType();
 
-            final HttpResponse response = httpClient.execute(request);
+        final HttpUriRequest request = RequestBuilder.post(uri)
+            .setEntity(entity)
+            .addHeader("Accept", mimeType)
+            .addHeader("Content-Type", mimeType)
+            .build();
 
-            final StatusLine statusLine = response.getStatusLine();
-            final String responseBody = EntityUtils.toString(response.getEntity());
+        final HttpResponse response = httpClient.execute(request);
 
-            LOG.info("response body : {}", responseBody);
+        final StatusLine statusLine = response.getStatusLine();
+        final String responseBody = EntityUtils.toString(response.getEntity());
 
-            if (statusLine.getStatusCode() >= 300) {
-                throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
-            }
-        } else {
-            LOG.info("akamai client is disabled, purge request not sent for path : {}", path);
+        LOG.info("response body : {}", responseBody);
+
+        if (statusLine.getStatusCode() >= 300) {
+            throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
         }
     }
 
