@@ -13,10 +13,10 @@
     <groupId>com.icfolson.aem.akamai</groupId>
     <artifactId>akamai-purge-replication-event-handler</artifactId>
     <packaging>bundle</packaging>
-    <name>AEM Akamai Purge Replication Event Handler</name>
+    <name>Akamai Purge Replication Event Handler</name>
     <description>
-        OSGi bundle providing a replication event handler and Akamai Fast Purge API client to purge content from Akamai
-        when content is replicated.
+        OSGi bundle for Adobe Experience Manager (AEM) providing a replication event handler and Akamai Fast Purge API
+        client to purge content from Akamai when content is replicated.
     </description>
     <version>0.0.1-SNAPSHOT</version>
 
@@ -24,6 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.junit.usefile>false</maven.junit.usefile>
+        <akamai.version>3.0.1</akamai.version>
     </properties>
 
     <build>
@@ -99,13 +100,13 @@
         <dependency>
             <groupId>com.akamai.edgegrid</groupId>
             <artifactId>edgegrid-signer-core</artifactId>
-            <version>3.0.1</version>
+            <version>${akamai.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.akamai.edgegrid</groupId>
             <artifactId>edgegrid-signer-apache-http-client</artifactId>
-            <version>3.0.1</version>
+            <version>${akamai.version}</version>
             <scope>provided</scope>
         </dependency>
 

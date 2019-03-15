@@ -1,16 +1,16 @@
-# AEM Akamai Purge Replication Event Handler
+# Akamai Purge Replication Event Handler
 
 [ICF Next](http://www.icfnext.com)
 
 ## Overview
 
-The Akamai Purge Replication Event Handler is an OSGi bundle for the Adobe Experience Manager (AEM) platform that uses the Akamai Fast Purge API to purge content from Akamai when content is replicated.
+The Akamai Purge Replication Event Handler is an OSGi bundle for the Adobe Experience Manager (AEM) platform that uses the [Akamai Fast Purge API](https://developer.akamai.com/api/core_features/fast_purge/v3.html) to purge content from Akamai when content is replicated.
 
 The included event handler listens to replication events for a configurable set of content paths.  When content is activated, deactivated, or deleted, the event handler creates a Sling job that sends a request using the Akamai Fast Purge API to invalidate or delete the externalized page/asset URL.
 
 ## Compatibility
 
-Akamai Purge Version | AEM Version(s)
+Bundle Version | AEM Version(s)
 ------------ | -------------
 0.x.x | 6.3, 6.4, 6.5
 
@@ -27,17 +27,19 @@ Akamai Purge Version | AEM Version(s)
 </dependency>
 ```
 
-2. TODO
+2. Add a [service user mapping](https://helpx.adobe.com/experience-manager/6-4/sites/administering/using/security-service-users.html#ServiceUsersandMappings) for the `akamai-purge-replication-event-handler` bundle.
+
+3. Configure the Akamai services as outlined below.
 
 ## Configuration
 
 ### Akamai Purge Replication Event Handler Configuration
 
-TODO
+Enable/disable the Akamai replication event handler and configure which resource paths should be purged.
 
 ### Akamai Edge Grid Client Configuration
 
-TODO
+Configure the Akamai network, hostname, and credentials (access token, client token, client secret).
 
 ## Job Cancellation Event Handlers
 
