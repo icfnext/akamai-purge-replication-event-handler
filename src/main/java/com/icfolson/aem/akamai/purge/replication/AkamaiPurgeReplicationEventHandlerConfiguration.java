@@ -13,5 +13,5 @@ public @interface AkamaiPurgeReplicationEventHandlerConfiguration {
     String[] includedPaths() default { "/content" };
 
     @AttributeDefinition(name = "Excluded Paths", description = "List of paths to exclude from purges.")
-    String[] excludedPaths() default {};
+    String[] excludedPaths();
 }

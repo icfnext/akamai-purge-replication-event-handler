@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Event handler for finished replication events to purge content from Akamai.
@@ -51,7 +54,7 @@ public final class AkamaiPurgeReplicationEventHandler implements EventHandler {
 
         final ReplicationActionType replicationActionType = ReplicationActionType.fromName(type);
 
-        if (enabled && isIndexed(path)) {
+        if (enabled && isIncluded(path)) {
             if (replicationActionType.equals(ReplicationActionType.ACTIVATE)) {
                 LOG.info("handling activate event for path = {}", path);
 
@@ -74,30 +77,26 @@ public final class AkamaiPurgeReplicationEventHandler implements EventHandler {
     @Modified
     protected void activate(final AkamaiPurgeReplicationEventHandlerConfiguration configuration) {
         enabled = configuration.enabled();
-        includedPaths = Arrays.asList(configuration.includedPaths());
-        excludedPaths = Arrays.asList(configuration.excludedPaths());
+        includedPaths = getConfiguredPaths(configuration.includedPaths());
+        excludedPaths = getConfiguredPaths(configuration.excludedPaths());
+    }
+
+    private List<String> getConfiguredPaths(final String[] paths) {
+        return Optional.ofNullable(paths)
+            .map(Arrays :: stream)
+            .orElseGet(Stream :: empty)
+            .collect(Collectors.toList());
     }
 
     /**
-     * Check if the given page path is indexed according to the rules defined in the OSGi service configuration.
+     * Check if the given page path is included according to the rules defined in the OSGi service configuration.
      *
      * @param path replicated page path
-     * @return true if path is indexed, false if not
+     * @return true if path is included, false if not
      */
-    private boolean isIndexed(final String path) {
-        boolean isIndexed = includedPaths.stream().anyMatch(path :: startsWith);
-
-        if (isIndexed) {
-            LOG.debug("found indexed path : {}", path);
-
-            isIndexed = excludedPaths.stream().noneMatch(path :: startsWith);
-
-            LOG.debug("path : {}, is excluded : {}", path, !isIndexed);
-        } else {
-            LOG.debug("non-indexed path : {}", path);
-        }
-
-        return isIndexed;
+    private boolean isIncluded(final String path) {
+        return includedPaths.stream().anyMatch(path :: startsWith) && excludedPaths.stream().noneMatch(
+            path :: startsWith);
     }
 
     /**
@@ -106,7 +105,7 @@ public final class AkamaiPurgeReplicationEventHandler implements EventHandler {
      * @param topic job topic
      * @param path page path
      */
-    protected void addJob(final String topic, final String path) {
+    private void addJob(final String topic, final String path) {
         LOG.info("adding job with topic : {} for page path : {}", topic, path);
 
         jobManager.addJob(topic, getJobProperties(path));

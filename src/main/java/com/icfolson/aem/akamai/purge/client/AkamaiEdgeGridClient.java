@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 /**
- * Akamai Edge Grid client for sending invalidate requests to Akamai for a given page path.
+ * Edge Grid client for sending invalidate/delete requests to Akamai for a given page path.
  */
 public interface AkamaiEdgeGridClient {
 
