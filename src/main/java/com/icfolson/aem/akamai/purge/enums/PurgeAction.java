@@ -4,6 +4,9 @@ import com.icfolson.aem.akamai.purge.job.AkamaiPurgeJobConsumer;
 import org.apache.sling.event.jobs.NotificationConstants;
 import org.osgi.service.event.Event;
 
+/**
+ * Akamai purge action.
+ */
 public enum PurgeAction {
     INVALIDATE,
     DELETE;
