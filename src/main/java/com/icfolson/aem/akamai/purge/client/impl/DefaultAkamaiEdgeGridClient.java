@@ -9,6 +9,7 @@ import com.icfolson.aem.akamai.purge.client.AkamaiEdgeGridClient;
 import com.icfolson.aem.akamai.purge.client.AkamaiEdgeGridClientConfiguration;
 import com.icfolson.aem.akamai.purge.enums.PurgeAction;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpResponseException;
@@ -116,8 +117,8 @@ public final class DefaultAkamaiEdgeGridClient implements AkamaiEdgeGridClient {
 
         final HttpUriRequest request = RequestBuilder.post(uri)
             .setEntity(entity)
-            .addHeader("Accept", mimeType)
-            .addHeader("Content-Type", mimeType)
+            .addHeader(HttpHeaders.ACCEPT, mimeType)
+            .addHeader(HttpHeaders.CONTENT_TYPE, mimeType)
             .build();
 
         final HttpResponse response = httpClient.execute(request);
