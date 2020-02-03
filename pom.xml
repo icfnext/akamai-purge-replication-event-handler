@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.junit.usefile>false</maven.junit.usefile>
-        <akamai.version>3.0.1</akamai.version>
+        <akamai.version>4.0.0</akamai.version>
     </properties>
 
     <build>
